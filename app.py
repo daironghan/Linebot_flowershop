@@ -14,14 +14,14 @@ load_dotenv()
 
 
 machine = TocMachine(
-    states=["user", "state1", "state2", "houseplant", "hpReccomend", "hpImage"],
+    states=["user", "houseplant", "hpReccomend", "hpImage", "lan", "lanSearch"],
     transitions=[
-        { "trigger": "advance", "source": "user", "dest": "state1", "conditions": "is_going_to_state1", },
-        { "trigger": "advance", "source": "user", "dest": "state2", "conditions": "is_going_to_state2",},
         { "trigger": "advance", "source": "user", "dest": "houseplant", "conditions": "is_going_to_houseplant",},
         { "trigger": "advance", "source": "houseplant", "dest": "hpReccomend", "conditions": "is_going_to_hpReccomend",},
         { "trigger": "advance", "source": "user", "dest": "hpImage", "conditions": "is_going_to_hpImage",},
-        { "trigger": "go_back", "source": ["state1", "state2", "hpReccomend", "hpImage"], "dest": "user"},
+        { "trigger": "advance", "source": "user", "dest": "lan", "conditions": "is_going_to_lan",},
+        { "trigger": "advance", "source": "lan", "dest": "lanSearch", "conditions": "is_going_to_lanSearch",},
+        { "trigger": "go_back", "source": ["hpReccomend", "hpImage", "lanSearch"], "dest": "user"},
     ],
     initial="user",
     auto_transitions=False,
@@ -44,7 +44,7 @@ if channel_access_token is None:
 line_bot_api = LineBotApi(channel_access_token)
 parser = WebhookParser(channel_secret)
 
-base_url = "https://4750-140-116-121-18.jp.ngrok.io"
+base_url = "https://ee26-140-116-121-18.jp.ngrok.io"
 
 @app.route("/callback", methods=["POST"])
 def callback():

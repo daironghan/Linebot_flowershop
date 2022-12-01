@@ -11,17 +11,18 @@ from fsm import TocMachine
 from utils import send_text_message, send_image_message
 
 load_dotenv()
-
+base_url = "https://1bc6-140-116-121-18.jp.ngrok.io"
 
 machine = TocMachine(
-    states=["user", "houseplant", "hpReccomend", "hpImage", "lan", "lanSearch"],
+    states=["user", "houseplant", "hpReccomend", "hpNewbie", "hpAdvanced","lan", "lanSearch"],
     transitions=[
         { "trigger": "advance", "source": "user", "dest": "houseplant", "conditions": "is_going_to_houseplant",},
         { "trigger": "advance", "source": "houseplant", "dest": "hpReccomend", "conditions": "is_going_to_hpReccomend",},
-        { "trigger": "advance", "source": "user", "dest": "hpImage", "conditions": "is_going_to_hpImage",},
+        { "trigger": "advance", "source": "user", "dest": "hpNewbie", "conditions": "is_going_to_hpNewbie",},
+        { "trigger": "advance", "source": "user", "dest": "hpAdvanced", "conditions": "is_going_to_hpAdvanced",},
         { "trigger": "advance", "source": "user", "dest": "lan", "conditions": "is_going_to_lan",},
         { "trigger": "advance", "source": "lan", "dest": "lanSearch", "conditions": "is_going_to_lanSearch",},
-        { "trigger": "go_back", "source": ["hpReccomend", "hpImage", "lanSearch"], "dest": "user"},
+        { "trigger": "go_back", "source": ["hpReccomend", "hpNewbie", "hpAdvanced", "lanSearch"], "dest": "user"},
     ],
     initial="user",
     auto_transitions=False,
@@ -44,7 +45,7 @@ if channel_access_token is None:
 line_bot_api = LineBotApi(channel_access_token)
 parser = WebhookParser(channel_secret)
 
-base_url = "https://ee26-140-116-121-18.jp.ngrok.io"
+
 
 @app.route("/callback", methods=["POST"])
 def callback():
@@ -75,7 +76,7 @@ def callback():
             response = machine.advance(event)
 
         if response == False:
-            line_bot_api.reply_message(event.reply_token, TextSendMessage('請按指示輸入喔'))
+            send_text_message(event.reply_token,'\U0001F335輸入"花語"\n可查詢各種花背後的意含\n\n\U0001F335輸入"盆栽推薦"\n可幫助想種植物但不之從哪裡開始的人呦')
 
     return "OK"
 

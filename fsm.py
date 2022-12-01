@@ -11,13 +11,60 @@ class TocMachine(GraphMachine):
     def __init__(self, **machine_configs):
         self.machine = GraphMachine(model=self, **machine_configs)
     
+    # 台灣植物名錄
+    def is_going_to_sci(self, event):
+        text = event.message.text
+        return text == "台灣植物名錄" or text == "臺灣植物名錄"
+    
+    def on_enter_sci(self, event):
+        send_text_message(event.reply_token, '請問要搜尋什麼植物？輸入俗稱\n\n請稍等查詢資料庫要一點時間喔~')
+
+    def is_going_to_sciSearch(self, event):
+        return True
+    
+    def on_enter_sciSearch(self, event):
+        text = event.message.text
+        response = requests.get(f"http://api.taicol.tw/v1/?common={text}")
+        response.encoding = 'utf-8'
+        data = response.json()
+        msg = ""
+        found = False
+        for i in range(1,len(data),1):
+            if data[i]['kingdom_c'] == "植物界":
+                found = True
+                s = f"\U0001F33F學名:{data[i]['name']}\n種(俗名):{data[i]['common_name']}\n門:{data[i]['phylum_c']}\n綱:{data[i]['class_c']}\n目:{data[i]['order_c']}\n科:{data[i]['family_c']}\n屬:{data[i]['genus_c']}\n\n\n"
+                msg = msg + s
+        msg = msg + '還要搜尋別的植物嗎？\n請輸入"是"或"否"'
+        if found:
+            send_text_message(event.reply_token, msg)
+        else:
+            send_text_message(event.reply_token, '查無資料:(\n還要搜尋別的植物嗎？請輸入"是"或"否"')
+    
+    def is_going_to_sciSearchAgain(self, event):
+        text = event.message.text
+        if text == "否":
+            self.go_back()
+        return text == "是"
+
     # 盆栽推薦
     def is_going_to_houseplant(self, event):
         text = event.message.text
         return text == "盆栽推薦"
     
     def on_enter_houseplant(self, event):
-        send_text_message(event.reply_token, '請問你有養過植物嗎？輸入"是"或"否"')
+        send_text_message(event.reply_token, '請問有養過植物嗎？輸入"是"或"否"')
+
+    def is_going_to_hpPet(self, event):
+        text = event.message.text
+        global newbie
+        if text == "否":
+            newbie = True
+        elif text == "是":
+            newbie = False
+        return text == "否" or text == "是" 
+    
+    def on_enter_hpPet(self, event):
+        send_text_message(event.reply_token, '請問家裡有養寵物嗎？(有些植物被誤食會危險)\n輸入"是"或"否"')
 
     def is_going_to_hpReccomend(self, event):
         text = event.message.text
@@ -25,12 +72,21 @@ class TocMachine(GraphMachine):
 
     def on_enter_hpReccomend(self, event):
         text = event.message.text
-        if text == "是":
-            send_imagemap(event.reply_token, "https://github.com/daironghan/Linebot_flowershop/blob/main/img/hpAdvanced.jpg?raw=true"
-            , "馬拉巴栗","長壽花","七里香","天堂鳥")
+        print(newbie)
+        if text == "是": # 有寵物
+            if newbie == True:
+                send_imagemap(event.reply_token, "https://github.com/daironghan/Linebot_flowershop/blob/main/img/hpAdvanced.jpg?raw=true"
+                , "馬拉巴栗","長壽花","七里香","天堂鳥")
+            else:
+                send_imagemap(event.reply_token, "https://github.com/daironghan/Linebot_flowershop/blob/main/img/hpAdvanced.jpg?raw=true"
+                , "ad","ad2","ad3","ad天堂鳥")
         else:
-            send_imagemap(event.reply_token, "https://github.com/daironghan/Linebot_flowershop/blob/main/img/hpNewbie.jpg?raw=true"
-            , "龜背芋","白牡丹","圓葉椒草","虎尾蘭")
+            if newbie == True:
+                send_imagemap(event.reply_token, "https://github.com/daironghan/Linebot_flowershop/blob/main/img/hpNewbie.jpg?raw=true"
+                , "龜背芋","白牡丹","圓葉椒草","虎尾蘭")
+            else:
+                send_imagemap(event.reply_token, "https://github.com/daironghan/Linebot_flowershop/blob/main/img/hpNewbie.jpg?raw=true"
+                , "adff","asffa","ge","ef")
         self.go_back()
     
     def is_going_to_hpNewbie(self, event):
@@ -40,7 +96,7 @@ class TocMachine(GraphMachine):
     def on_enter_hpNewbie(self, event):
         text = event.message.text
         if text == "龜背芋":
-            send_text_message(event.reply_token, "\U0001F331龜背芋 又稱龜背竹\n葉子的形狀很特別 能營造出熱帶雨林的氣息~ 最近在許多室內擺設都能看到他的蹤跡呦")
+            send_text_message(event.reply_token, "\U0001F331龜背芋 又稱龜背竹\n葉子的形狀很特別，能營造出熱帶雨林的氣息~ 最近在許多室內擺設都能看到他的蹤跡呦")
         elif text == "白牡丹":
             send_text_message(event.reply_token, "\U0001F331白牡丹\n屬於近期很夯的多肉植物 如玫瑰的外型非常漂亮 適合養在乾燥通風的環境")
         elif text == "圓葉椒草":

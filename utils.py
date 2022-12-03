@@ -1,12 +1,13 @@
 import os
 
 from linebot import LineBotApi, WebhookParser
-from linebot.models import MessageEvent, TextMessage, TextSendMessage, ImageSendMessage, ImagemapSendMessage
+from linebot.models import MessageEvent, TextMessage, TextSendMessage, ImageSendMessage, ImagemapSendMessage, FlexSendMessage
 from linebot.models import *
 
 channel_access_token = os.getenv("LINE_CHANNEL_ACCESS_TOKEN", None)
 BASEURL = "https://687e-140-116-121-18.jp.ngrok.io"
 
+from template import menu
 
 def send_text_message(reply_token, text):
     line_bot_api = LineBotApi(channel_access_token)
@@ -62,6 +63,16 @@ def send_imagemap(reply_token, url, c1, c2, c3, c4):
         ]
     )
     line_bot_api.reply_message(reply_token, message)
+    return "OK"
+
+def send_flex_message(reply_token, c):
+    line_bot_api = LineBotApi(channel_access_token)
+    if c == "menu":
+        fmsg = FlexSendMessage(
+            alt_text = "menu",
+            contents = menu,
+        )
+    line_bot_api.reply_message(reply_token, fmsg)
     return "OK"
 """
 def send_image_url(id, img_url):

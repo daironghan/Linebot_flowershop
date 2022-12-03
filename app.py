@@ -8,10 +8,10 @@ from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage
 
 from fsm import TocMachine
-from utils import send_text_message, send_image_message
+from utils import send_text_message, send_image_message, send_flex_message
 
 load_dotenv()
-base_url = "https://2c4f-140-116-121-18.jp.ngrok.io"
+base_url = "https://73c9-140-116-121-18.jp.ngrok.io"
 
 machine = TocMachine(
     states=["user", "sci", "sciSearch", "sciAdvanced", "sciAdSearch", "test", "q1", "q2", "q3", "testResult","houseplant", "hpPet","hpReccomend", "hpInfo", "lan", "lanSearch"],
@@ -92,7 +92,8 @@ def callback():
 
         if response == False:
             if machine.state == 'user':
-                send_text_message(event.reply_token, '\U0001F335輸入"臺灣植物名錄"\n可查尋臺灣的現有的植物物種喔\n\n\U0001F335輸入"小學堂"\n測測看你可以連續答對幾題關於植物的問題吧！\n\n\U0001F335輸入"盆栽推薦"\n可以幫助想種植室內盆栽但不知道從哪裡開始的人呦~\n\n\U0001F335輸入"花語"\n可查詢各種花背後的意含呦')
+                #send_text_message(event.reply_token, '\U0001F335輸入"臺灣植物名錄"\n可查尋臺灣的現有的植物物種喔\n\n\U0001F335輸入"小學堂"\n測測看你可以連續答對幾題關於植物的問題吧！\n\n\U0001F335輸入"盆栽推薦"\n可以幫助想種植室內盆栽但不知道從哪裡開始的人呦~\n\n\U0001F335輸入"花語"\n可查詢各種花背後的意含呦')
+                send_flex_message(event.reply_token, 'menu')
             else:
                 send_text_message(event.reply_token, '請依照指示輸入喔')
 

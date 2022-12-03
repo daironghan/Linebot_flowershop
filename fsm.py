@@ -42,7 +42,7 @@ class TocMachine(GraphMachine):
                 name.append(data[i]['common_name'])
                 s = f"\U0001F33F{data[i]['common_name']}\n"
                 msg = msg + s
-        msg = msg + '\n\U0001F338輸入"搜尋植物" 搜尋別的植物\n\n\U0001F338輸入"進階查詢" 進階查詢某個物種\n\n\U0001F338輸入"返回" 返回主選單'
+        msg = msg + '\n\U0001F338輸入"搜尋植物" 搜尋別的植物\n\U0001F338輸入"進階查詢" 進階查詢某個物種\n\U0001F338輸入"返回" 返回主選單'
         global nameCode
         nameCode = pd.DataFrame.from_dict({'name':name, 'name_code':name_code})
         if found:
@@ -77,7 +77,7 @@ class TocMachine(GraphMachine):
         response.encoding = 'utf-8'
         data = response.json()
         msg = f"\U0001F33F學名:{data[1]['name']}\n俗名:{data[1]['common_name']}\n門:{data[1]['phylum_c']}\n綱:{data[1]['class_c']}\n目:{data[1]['order_c']}\n科:{data[1]['family_c']}\n屬:{data[1]['genus_c']}"
-        msg = msg + '\n\n\U0001F338輸入"搜尋植物" 搜尋別的植物\n\n\U0001F338輸入"進階查詢" 重新進階查詢某個物種\n\n\U0001F338輸入"返回" 返回主選單'
+        msg = msg + '\n\n\U0001F338輸入"搜尋植物" 搜尋別的植物\n\U0001F338輸入"進階查詢" 重新進階查詢某個物種\n\U0001F338輸入"返回" 返回主選單'
         send_text_message(event.reply_token, msg)
 
     def is_going_to_sciAdSearchAgain(self, event):
@@ -90,7 +90,7 @@ class TocMachine(GraphMachine):
         return text == "小學堂"
 
     def on_enter_test(self, event):
-        send_text_message(event.reply_token, '準備好開始測驗了嗎？\n\n\U0001F338輸入"開始" 開始答題\n\U0001F338輸入"返回" 返回主選單')
+        send_text_message(event.reply_token, '總共有3道題目 答錯一次就結束\n準備好開始測驗了嗎？\n\n\U0001F338輸入"開始" 開始答題\n\U0001F338輸入"返回" 返回主選單')
     
     def is_going_to_q1(self, event):
         text = event.message.text
@@ -136,7 +136,7 @@ class TocMachine(GraphMachine):
             q = "胚珠受粉後，會在什麼構造內形成「種子」？\n(A) 子宮 (B) 柱頭 (C) 花柱 (D) 子房"
             ans = "d"
         elif r==2:
-            q = "「木本莖」的敘述，下列哪一項是錯誤的？\n((A) 枝幹容易形成樹蔭，提供人們乘涼 (B) 一個人的手臂有時無法完整環抱樹幹 (C) 莖通常粗壯，不容易推動 (D) 通常在莖的表面會長出細毛"
+            q = "「木本莖」的敘述，下列哪一項是錯誤的？\n(A) 枝幹容易形成樹蔭，提供人們乘涼 (B) 一個人的手臂有時無法完整環抱樹幹 (C) 莖通常粗壯，不容易推動 (D) 通常在莖的表面會長出細毛"
             ans = "d"
         msg = q + '\n\n\U0001F338請輸入英文字母回答'
         send_text_message(event.reply_token, msg)
@@ -197,7 +197,7 @@ class TocMachine(GraphMachine):
         return text == "盆栽推薦"
     
     def on_enter_houseplant(self, event):
-        send_text_message(event.reply_token, '請問有養過植物嗎？輸入"是"或"否"')
+        send_text_message(event.reply_token, '請問有養過植物嗎？\n\U0001F338輸入"是"或"否"')
 
     def is_going_to_hpPet(self, event):
         text = event.message.text
@@ -209,7 +209,7 @@ class TocMachine(GraphMachine):
         return text == "否" or text == "是" 
     
     def on_enter_hpPet(self, event):
-        send_text_message(event.reply_token, '請問預計種植盆栽的空間有養寵物嗎？\n輸入"是"或"否"')
+        send_text_message(event.reply_token, '請問預計種植盆栽的空間有養寵物嗎？\n\U0001F338輸入"是"或"否"')
 
     def is_going_to_hpReccomend(self, event):
         text = event.message.text
@@ -274,7 +274,7 @@ class TocMachine(GraphMachine):
             msg = "\U0001F331西瓜皮椒草\n圓的葉子配上條紋非常可愛，注意須須培養於排水透氣性良好的土壤"
         elif text == "空氣鳳梨":
             msg = "\U0001F331空氣鳳梨\n有許多品種，最大特色是能完全生活於空氣之中、不需要土壤，因此也有人稱它為「空氣草」"
-        msg = msg + '\n\n\U0001F338點選其他盆栽\n或\n\U0001F338輸入"返回" 返回主選單'
+        msg = msg + '\n\n\U0001F338點選其他盆栽\n\U0001F338輸入"返回" 返回主選單'
         send_text_message(event.reply_token, msg)
 
     # 花語

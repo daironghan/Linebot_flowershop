@@ -11,22 +11,27 @@ from fsm import TocMachine
 from utils import send_text_message, send_image_message
 
 load_dotenv()
-base_url = "https://889c-140-116-121-18.jp.ngrok.io"
+base_url = "https://1ae4-140-116-121-18.jp.ngrok.io"
 
 machine = TocMachine(
-    states=["user", "sci", "sciSearch", "test", "houseplant", "hpPet","hpReccomend", "hpNewbie", "hpAdvanced","lan", "lanSearch"],
+    states=["user", "sci", "sciSearch", "sciAdvanced", "sciAdSearch", "houseplant", "hpPet","hpReccomend", "hpInfo", "lan", "lanSearch"],
     transitions=[
         { "trigger": "advance", "source": "user", "dest": "sci", "conditions": "is_going_to_sci",},
         { "trigger": "advance", "source": "sci", "dest": "sciSearch", "conditions": "is_going_to_sciSearch",},
         { "trigger": "advance", "source": "sciSearch", "dest": "sci", "conditions": "is_going_to_sciSearchAgain",},
+        { "trigger": "advance", "source": "sciSearch", "dest": "sciAdvanced", "conditions": "is_going_to_sciAdvanced",},
+        { "trigger": "advance", "source": "sciAdvanced", "dest": "sciAdSearch", "conditions": "is_going_to_sciAdSearch",},
+        { "trigger": "advance", "source": "sciAdSearch", "dest": "sciAdvanced", "conditions": "is_going_to_sciAdSearchAgain",},
+        { "trigger": "advance", "source": "sciAdSearch", "dest": "sci", "conditions": "is_going_to_sciSearchAgain",},
         { "trigger": "advance", "source": "user", "dest": "houseplant", "conditions": "is_going_to_houseplant",},
         { "trigger": "advance", "source": "houseplant", "dest": "hpPet", "conditions": "is_going_to_hpPet",},
         { "trigger": "advance", "source": "hpPet", "dest": "hpReccomend", "conditions": "is_going_to_hpReccomend",},
-        { "trigger": "advance", "source": "user", "dest": "hpNewbie", "conditions": "is_going_to_hpNewbie",},
-        { "trigger": "advance", "source": "user", "dest": "hpAdvanced", "conditions": "is_going_to_hpAdvanced",},
+        { "trigger": "advance", "source": "hpReccomend", "dest": "hpInfo", "conditions": "is_going_to_hpInfo",},
+        { "trigger": "advance", "source": "hpInfo", "dest": "hpInfo", "conditions": "is_going_to_hpInfo",},
         { "trigger": "advance", "source": "user", "dest": "lan", "conditions": "is_going_to_lan",},
         { "trigger": "advance", "source": "lan", "dest": "lanSearch", "conditions": "is_going_to_lanSearch",},
-        { "trigger": "go_back", "source": ["sciSearch", "hpReccomend", "hpNewbie", "hpAdvanced", "lanSearch"], "dest": "user"},
+        { "trigger": "advance", "source": "lanSearch", "dest": "lan", "conditions": "is_going_to_lanSearchAgain",},
+        { "trigger": "go_back", "source": ["sciSearch","sciAdSearch", "hpInfo", "lanSearch"], "dest": "user"},
     ],
     initial="user",
     auto_transitions=False,
@@ -80,40 +85,42 @@ def callback():
             response = machine.advance(event)
 
         if response == False:
-            send_text_message(event.reply_token,
-            '\U0001F335輸入"臺灣植物名錄"\n可查尋臺灣的現有的植物物種喔\n\n\U0001F335輸入"冷知識"\n可以學到一個植物的小小冷知識\n\n\U0001F335輸入"室內盆栽推薦"\n看了許多植物的知識後是不是也想種種看呢~\n\n\U0001F335輸入"花語"\n可查詢各種花背後的意含呦')
+            if machine.state == 'user':
+                send_text_message(event.reply_token, '\U0001F335輸入"臺灣植物名錄"\n可查尋臺灣的現有的植物物種喔\n\n\U0001F335輸入"冷知識"\n可以學到一個植物的小小冷知識\n\n\U0001F335輸入"室內盆栽推薦"\n看了許多植物的知識後是不是也想種種看呢~\n\n\U0001F335輸入"花語"\n可查詢各種花背後的意含呦')
+            else:
+                send_text_message(event.reply_token, '請依照指示輸入喔')
 
     return "OK"
 
 
-@app.route("/webhook", methods=["POST"])
-def webhook_handler():
-    signature = request.headers["X-Line-Signature"]
-    # get request body as text
-    body = request.get_data(as_text=True)
-    app.logger.info(f"Request body: {body}")
+# @app.route("/webhook", methods=["POST"])
+# def webhook_handler():
+#     signature = request.headers["X-Line-Signature"]
+#     # get request body as text
+#     body = request.get_data(as_text=True)
+#     app.logger.info(f"Request body: {body}")
 
-    # parse webhook body
-    try:
-        events = parser.parse(body, signature)
-    except InvalidSignatureError:
-        abort(400)
+#     # parse webhook body
+#     try:
+#         events = parser.parse(body, signature)
+#     except InvalidSignatureError:
+#         abort(400)
 
-    # if event is MessageEvent and message is TextMessage, then echo text
-    for event in events:
-        if not isinstance(event, MessageEvent):
-            continue
-        if not isinstance(event.message, TextMessage):
-            continue
-        if not isinstance(event.message.text, str):
-            continue
-        print(f"\nFSM STATE: {machine.state}")
-        print(f"REQUEST BODY: \n{body}")
-        response = machine.advance(event)
-        if response == False:
-            send_text_message(event.reply_token, "Not Entering any State")
+#     # if event is MessageEvent and message is TextMessage, then echo text
+#     for event in events:
+#         if not isinstance(event, MessageEvent):
+#             continue
+#         if not isinstance(event.message, TextMessage):
+#             continue
+#         if not isinstance(event.message.text, str):
+#             continue
+#         print(f"\nFSM STATE: {machine.state}")
+#         print(f"REQUEST BODY: \n{body}")
+#         response = machine.advance(event)
+#         if response == False:
+#             send_text_message(event.reply_token, "Not Entering any State")
 
-    return "OK"
+#     return "OK"
 
 
 @app.route("/fsm", methods=["GET"])

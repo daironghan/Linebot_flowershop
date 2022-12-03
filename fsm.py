@@ -5,7 +5,7 @@ from utils import send_text_message, send_image_message, send_imagemap
 from bs4 import BeautifulSoup
 import requests
 import pandas as pd
-
+import random
 
 class TocMachine(GraphMachine):
     def __init__(self, **machine_configs):
@@ -84,6 +84,113 @@ class TocMachine(GraphMachine):
         text = event.message.text
         return text == "進階查詢"
 
+    # 小學堂
+    def is_going_to_test(self, event):
+        text = event.message.text
+        return text == "小學堂"
+
+    def on_enter_test(self, event):
+        send_text_message(event.reply_token, '準備好開始測驗了嗎？\n\n\U0001F338輸入"開始" 開始答題\n\U0001F338輸入"返回" 返回主選單')
+    
+    def is_going_to_q1(self, event):
+        text = event.message.text
+        if text == "返回":
+            self.go_back()
+        return text == "開始"
+    
+    def on_enter_q1(self, event):
+        r = random.randint(0,2)
+        msg = ""
+        global qcnt 
+        qcnt = 0
+        global ans
+        global q
+        if r==0:
+            q = "「樹幹」是指大樹的哪個部位呢？\n(A) 根 (B) 莖 (C) 葉 (D)花"
+            ans = "b"
+        elif r==1:
+            q = "植物體內輸送水分的路線是？\n(A) 莖→根→葉 (B) 莖→葉→根 (C) 葉→根→莖 (D) 根→莖→葉"
+            ans = "d"
+        elif r==2:
+            q = "下述何者植物非裸子植物?\n(A) 銀杏 (B)蘇鐵 (C)紅檜 (D)桑樹"
+            ans = "b"
+        msg = q + '\n\n\U0001F338請輸入英文字母回答'
+        send_text_message(event.reply_token, msg)
+
+    def is_going_to_q2(self, event):
+        text = event.message.text.lower()
+        return text == ans
+
+    def on_enter_q2(self, event):
+        r = random.randint(0,2)
+        global qcnt 
+        qcnt = 1
+        global ans
+        global q
+        global sol
+        msg = ""
+        if r==0:
+            q = "下列哪一組植物具有肥大的根，可儲存大量的養分？\n(A) 石蓮、地瓜 (B) 胡蘿蔔、白蘿蔔 (C) 馬鈴薯、芋頭 (D) 仙人掌、馬鈴薯"
+            ans = "b"
+        elif r==1:
+            q = "胚珠受粉後，會在什麼構造內形成「種子」？\n(A) 子宮 (B) 柱頭 (C) 花柱 (D) 子房"
+            ans = "d"
+        elif r==2:
+            q = "「木本莖」的敘述，下列哪一項是錯誤的？\n((A) 枝幹容易形成樹蔭，提供人們乘涼 (B) 一個人的手臂有時無法完整環抱樹幹 (C) 莖通常粗壯，不容易推動 (D) 通常在莖的表面會長出細毛"
+            ans = "d"
+        msg = q + '\n\n\U0001F338請輸入英文字母回答'
+        send_text_message(event.reply_token, msg)
+    
+    def is_going_to_q3(self, event):
+        text = event.message.text.lower()
+        return text == ans
+
+    def on_enter_q3(self, event):
+        r = random.randint(0,2)
+        msg = ""
+        global qcnt 
+        qcnt = 2
+        global ans
+        global q
+        global sol
+        if r==0:
+            q = "下列哪一種植物的是草本莖？\n(A) 牽牛花 (B) 臺灣欒樹 (C) 七里香 (D) 松樹。"
+            ans = "a"
+        elif r==1:
+            q = "下列關於植物光週期調控的敘述，何者正確？\n(A) 光週期日照時間短於臨界日照時間時才開花的植物為短日照植物(B) 所有植物開花與否皆受光週期的影響 (C) 日照期對植物開花的影響比連續黑暗期更重要 (D) 短日照植物在光週期中受紅光（R）短暫處理，不會影響其開花"
+            ans = 'a'
+        elif r==2:
+            q = "「草本莖」植物的敘述，哪一項是正確的？\n(A)芋頭的莖屬於鱗莖 (B) 馬鈴薯的莖屬於球莖 (C) 蛇莓的走莖可以用來繁殖 (D) 絲瓜捲鬚莖是為了美觀而生長的"
+            ans = "c"
+        msg = q + '\n\n\U0001F338請輸入英文字母回答'
+        send_text_message(event.reply_token, msg)
+
+    def is_going_to_testResult(self, event):
+        text = event.message.text.lower()
+        return (text != ans or qcnt==2) and (text == 'a' or text == 'b' or text == 'c' or text == 'd')
+
+    def on_enter_testResult(self, event):
+        msg = ""
+        if event.message.text.lower() == ans:
+            msg = "\U0001F3C6植物小達人\n答對題數: 3\n好厲害全部都答對囉~"
+        elif qcnt == 2:
+            msg = f"錯了！正確答案為：{ans.upper()}\n"
+            msg = msg + "\n\U0001F44D答對題數: 2\n差一點就全對囉~"
+        elif qcnt == 1:
+            msg = f"錯了！正確答案為：{ans.upper()}\n"
+            msg = msg + "\n\U0001F44D答對題數: 1\n有進步的空間！"
+        elif qcnt == 0:
+            msg = f"錯了！正確答案為：{ans.upper()}\n"
+            msg =  msg +"\n\U0001F342答對題數: 0\n看來要多補充一點植物的知識囉~"
+        msg = msg + '\n\n\U0001F338輸入"重新開始" 重新開始測驗\n\U0001F338輸入"返回" 返回主選單'
+        send_text_message(event.reply_token, msg)
+    
+    def is_going_to_testAgain(self, event):
+        text = event.message.text
+        if text == "返回":
+            self.go_back()
+        return text == "重新開始"
+
     # 盆栽推薦
     def is_going_to_houseplant(self, event):
         text = event.message.text
@@ -142,68 +249,33 @@ class TocMachine(GraphMachine):
         if text == "龜背芋":
             msg = "\U0001F331龜背芋 又稱龜背竹\n葉子的形狀很特別，能營造出熱帶雨林的氣息~ 最近在許多室內擺設都能看到他的蹤跡呦"
         elif text == "白牡丹":
-            msg = "\U0001F331白牡丹\n屬於近期很夯的多肉植物 如玫瑰的外型非常漂亮 適合養在乾燥通風的環境"
+            msg = "\U0001F331白牡丹\n屬於近期很夯的多肉植物，如玫瑰的外型非常漂亮，適合養在乾燥通風的環境"
         elif text == "圓葉椒草":
-            msg = "\U0001F331圓葉椒草\n外型可愛 圓圓的葉子像硬幣 因此又稱圓葉發財樹 是新手的選擇之一喔"
+            msg = "\U0001F331圓葉椒草\n外型可愛，圓圓的葉子像硬幣，因此又稱「圓葉發財樹」，是新手的選擇之一喔"
         elif text == "虎尾蘭":
-            msg = "\U0001F331虎尾蘭\n有著「空氣清淨機」的稱號 很好照顧大約兩三周澆一次水即可 新手也能上手呦~"
+            msg = "\U0001F331虎尾蘭\n有著「空氣清淨機」的稱號，很好照顧大約兩三周澆一次水即可，新手也能上手呦~"
         elif text == "馬拉巴栗":
-            msg = "\U0001F331馬拉巴栗 又稱發財樹\n原生於中美墨西哥 常見於辦公室 也適合送禮呦"
+            msg = "\U0001F331馬拉巴栗 又稱發財樹\n原生於中美墨西哥，常見於辦公室，也適合送禮呦"
         elif text == "長壽花":
-            msg = "\U0001F331長壽花\n開花時顏色鮮艷 可為空間帶來許多色彩 因名字吉祥許多人也拿來送禮喔"
+            msg = "\U0001F331長壽花\n開花時顏色鮮艷，可為空間帶來許多色彩，因名字吉祥許多人也拿來送禮喔"
         elif text == "七里香":
-            msg = "\U0001F331七里香 原名月橘\n屬於比較有挑戰的植物 但其自然的香氣可比人工的香分厲害呦"
+            msg = "\U0001F331七里香 原名月橘\n屬於比較有挑戰的植物，但其自然的香氣可比人工的香分厲害呦"
         elif text == "天堂鳥": 
-            msg = "\U0001F331天堂鳥\n堪稱室內植物界的女王 屬於室內大型植物而且生長非常快速 適合室內空間較大者種植"
+            msg = "\U0001F331天堂鳥\n堪稱室內植物界的女王，屬於室內大型植物而且生長非常快速，適合室內空間較大者種植"
         elif text == "青蘋果竹芋":
-            msg = "\U0001F331青蘋果竹芋\n"
+            msg = "\U0001F331青蘋果竹芋\n原生於陰涼的森林因此對光教敏，感容易焦邊，是頗具挑戰性的植物呦"
         elif text == "吊蘭":
-            msg = "\U0001F331吊蘭\n常見的居室垂掛植物之一，是良好的室內空氣淨化植物,可吸收甲醛等有毒氣體功能呦"
+            msg = "\U0001F331吊蘭\n常見的居室垂掛植物之一，是良好的室內空氣淨化植物，可吸收甲醛等有毒氣體功能呦"
         elif text == "非洲菫":
-            msg = "\U0001F331非洲菫\n花色與花型非常多樣性 是難得室內低光度可開花的植物喔~"
+            msg = "\U0001F331非洲菫\n花色與花型非常多樣性，是難得室內低光度可開花的植物喔~"
         elif text == "袖珍椰子":
-            msg = "\U0001F331袖珍椰子\n"
+            msg = "\U0001F331袖珍椰子\n為最據代表性的椰子類植物中小型，想要為室內增添一番渡假風的不防試試"
         elif text == "西瓜皮椒草":
-            msg = "\U0001F331西瓜皮椒草\n"
+            msg = "\U0001F331西瓜皮椒草\n圓的葉子配上條紋非常可愛，注意須須培養於排水透氣性良好的土壤"
         elif text == "空氣鳳梨":
-            msg = "\U0001F331空氣鳳梨\n"
+            msg = "\U0001F331空氣鳳梨\n有許多品種，最大特色是能完全生活於空氣之中、不需要土壤，因此也有人稱它為「空氣草」"
         msg = msg + '\n\n\U0001F338點選其他盆栽\n或\n\U0001F338輸入"返回" 返回主選單'
         send_text_message(event.reply_token, msg)
-
-
-    # def is_going_to_hpNewbie(self, event):
-    #     text = event.message.text
-    #     return text == "龜背芋" or text == "白牡丹" or text == "圓葉椒草" or text == "虎尾蘭"
-    
-    # def on_enter_hpNewbie(self, event):
-    #     text = event.message.text
-
-    #     if text == "龜背芋":
-    #         send_text_message(event.reply_token, "\U0001F331龜背芋 又稱龜背竹\n葉子的形狀很特別，能營造出熱帶雨林的氣息~ 最近在許多室內擺設都能看到他的蹤跡呦")
-    #     elif text == "白牡丹":
-    #         send_text_message(event.reply_token, "\U0001F331白牡丹\n屬於近期很夯的多肉植物 如玫瑰的外型非常漂亮 適合養在乾燥通風的環境")
-    #     elif text == "圓葉椒草":
-    #         send_text_message(event.reply_token, "\U0001F331圓葉椒草\n外型可愛 圓圓的葉子像硬幣 因此又稱圓葉發財樹 是新手的選擇之一喔")
-    #     elif text == "虎尾蘭":
-    #         send_text_message(event.reply_token, "\U0001F331虎尾蘭\n有著「空氣清淨機」的稱號 很好照顧大約兩三周澆一次水即可 新手也能上手呦~")
-   
-    #     self.go_back()
-    
-    # def is_going_to_hpAdvanced(self, event):
-    #     text = event.message.text
-    #     return text == "馬拉巴栗" or text == "長壽花" or text == "七里香" or text == "天堂鳥"
-    
-    # def on_enter_hpAdvanced(self, event):
-    #     text = event.message.text
-    #     if text == "馬拉巴栗":
-    #         send_text_message(event.reply_token, "\U0001F331馬拉巴栗 又稱發財樹\n原生於中美墨西哥 常見於辦公室 也適合送禮呦")
-    #     elif text == "長壽花":
-    #         send_text_message(event.reply_token, "\U0001F331長壽花\n開花時顏色鮮艷 可為空間帶來許多色彩 因名字吉祥許多人也拿來送禮喔")
-    #     elif text == "七里香":
-    #         send_text_message(event.reply_token, "\U0001F331七里香 原名月橘\n屬於比較有挑戰的植物 但其自然的香氣可比人工的香分厲害呦")
-    #     elif text == "天堂鳥":
-    #         send_text_message(event.reply_token, "\U0001F331天堂鳥\n堪稱室內植物界的女王 屬於室內大型植物而且生長非常快速 適合室內空間較大者種植")
-    #     self.go_back()
 
     # 花語
     def is_going_to_lan(self, event):
@@ -238,7 +310,7 @@ class TocMachine(GraphMachine):
                 msg = df.Language[i]+ '\n\n\U0001F338輸入"重新搜尋" 重新查詢花語\n\U0001F338輸入"返回" 返回主選單'
                 send_text_message(event.reply_token, msg)
         if not found:
-            send_text_message(event.reply_token, '抱歉查無資料:(\n\U0001F338輸入"重新搜尋" 重新查詢花語\n\U0001F338輸入"返回" 返回主選單')
+            send_text_message(event.reply_token, '抱歉查無資料:(\n\n\U0001F338輸入"重新搜尋" 重新查詢花語\n\U0001F338輸入"返回" 返回主選單')
         
 
     def is_going_to_lanSearchAgain(self, event):

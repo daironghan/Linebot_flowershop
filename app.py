@@ -11,10 +11,10 @@ from fsm import TocMachine
 from utils import send_text_message, send_image_message
 
 load_dotenv()
-base_url = "https://1ae4-140-116-121-18.jp.ngrok.io"
+base_url = "https://2c4f-140-116-121-18.jp.ngrok.io"
 
 machine = TocMachine(
-    states=["user", "sci", "sciSearch", "sciAdvanced", "sciAdSearch", "houseplant", "hpPet","hpReccomend", "hpInfo", "lan", "lanSearch"],
+    states=["user", "sci", "sciSearch", "sciAdvanced", "sciAdSearch", "test", "q1", "q2", "q3", "testResult","houseplant", "hpPet","hpReccomend", "hpInfo", "lan", "lanSearch"],
     transitions=[
         { "trigger": "advance", "source": "user", "dest": "sci", "conditions": "is_going_to_sci",},
         { "trigger": "advance", "source": "sci", "dest": "sciSearch", "conditions": "is_going_to_sciSearch",},
@@ -23,6 +23,12 @@ machine = TocMachine(
         { "trigger": "advance", "source": "sciAdvanced", "dest": "sciAdSearch", "conditions": "is_going_to_sciAdSearch",},
         { "trigger": "advance", "source": "sciAdSearch", "dest": "sciAdvanced", "conditions": "is_going_to_sciAdSearchAgain",},
         { "trigger": "advance", "source": "sciAdSearch", "dest": "sci", "conditions": "is_going_to_sciSearchAgain",},
+        { "trigger": "advance", "source": "user", "dest": "test", "conditions": "is_going_to_test",},
+        { "trigger": "advance", "source": "test", "dest": "q1", "conditions": "is_going_to_q1",},
+        { "trigger": "advance", "source": "q1", "dest": "q2", "conditions": "is_going_to_q2",},
+        { "trigger": "advance", "source": "q2", "dest": "q3", "conditions": "is_going_to_q3",},
+        { "trigger": "advance", "source": ["q1", "q2", "q3"], "dest": "testResult", "conditions": "is_going_to_testResult",},
+        { "trigger": "advance", "source": "testResult", "dest": "q1", "conditions": "is_going_to_testAgain",},
         { "trigger": "advance", "source": "user", "dest": "houseplant", "conditions": "is_going_to_houseplant",},
         { "trigger": "advance", "source": "houseplant", "dest": "hpPet", "conditions": "is_going_to_hpPet",},
         { "trigger": "advance", "source": "hpPet", "dest": "hpReccomend", "conditions": "is_going_to_hpReccomend",},
@@ -31,7 +37,7 @@ machine = TocMachine(
         { "trigger": "advance", "source": "user", "dest": "lan", "conditions": "is_going_to_lan",},
         { "trigger": "advance", "source": "lan", "dest": "lanSearch", "conditions": "is_going_to_lanSearch",},
         { "trigger": "advance", "source": "lanSearch", "dest": "lan", "conditions": "is_going_to_lanSearchAgain",},
-        { "trigger": "go_back", "source": ["sciSearch","sciAdSearch", "hpInfo", "lanSearch"], "dest": "user"},
+        { "trigger": "go_back", "source": ["sciSearch","sciAdSearch", "test", "testResult", "hpInfo", "lanSearch"], "dest": "user"},
     ],
     initial="user",
     auto_transitions=False,
@@ -86,7 +92,7 @@ def callback():
 
         if response == False:
             if machine.state == 'user':
-                send_text_message(event.reply_token, '\U0001F335輸入"臺灣植物名錄"\n可查尋臺灣的現有的植物物種喔\n\n\U0001F335輸入"冷知識"\n可以學到一個植物的小小冷知識\n\n\U0001F335輸入"室內盆栽推薦"\n看了許多植物的知識後是不是也想種種看呢~\n\n\U0001F335輸入"花語"\n可查詢各種花背後的意含呦')
+                send_text_message(event.reply_token, '\U0001F335輸入"臺灣植物名錄"\n可查尋臺灣的現有的植物物種喔\n\n\U0001F335輸入"小學堂"\n測測看你可以連續答對幾題關於植物的問題吧！\n\n\U0001F335輸入"盆栽推薦"\n可以幫助想種植室內盆栽但不知道從哪裡開始的人呦~\n\n\U0001F335輸入"花語"\n可查詢各種花背後的意含呦')
             else:
                 send_text_message(event.reply_token, '請依照指示輸入喔')
 

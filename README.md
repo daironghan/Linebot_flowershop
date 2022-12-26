@@ -18,7 +18,7 @@ GreenFingers 是一個有趣的植物小教室
     - 隨機挑選題目給使用者
 3. 室內盆栽推薦：根據使用者的回答來推薦適合的室內盆栽
     - 使用Line Messaging Api中的Imagemap Message傳送圖片按鈕
-4. 花語查詢：查詢花語背後的
+4. 花語查詢：查詢各種花背後的語意
     - 使用網路爬蟲爬取部落客資料
 ## FSM
 ![](https://github.com/daironghan/Linebot_GreenFingers/blob/main/img/fsm.jpg?raw=true)
@@ -49,7 +49,7 @@ GreenFingers 是一個有趣的植物小教室
     - 點選圖片即可獲得更詳細的介紹
 ![](https://github.com/daironghan/Linebot_GreenFingers/blob/main/img/ex_hp.jpg?raw=true)
 
-### 花語查詢：查詢花語背後的
+### 花語查詢：查詢各種花背後的語意
     - 首先會對使用者進行簡單的訪問
     - 會依據使用者的回覆推薦對應的盆栽
     - 可重復查詢

@@ -24,7 +24,7 @@ GreenFingers 是一個有趣的植物小教室
 ![](https://github.com/daironghan/Linebot_GreenFingers/blob/main/img/fsm.jpg?raw=true)
 
 ## 示範
-首先會進入首頁 可以在這裡點選想要的功能
+首先，輸入任何訊息之後會進入首頁，可以在這裡點選想要的功能
 
 ![](https://github.com/daironghan/Linebot_GreenFingers/blob/main/img/menu_sci.jpg?raw=true)
 ![](https://github.com/daironghan/Linebot_GreenFingers/blob/main/img/menu_test.jpg?raw=true)

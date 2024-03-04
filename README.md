@@ -63,9 +63,6 @@ GreenFingers 是一個有趣的植物小教室
 若使用者輸入錯誤將顯示如下
 ![](https://github.com/daironghan/Linebot_GreenFingers/blob/main/img/ex_error.jpg?raw=true)
 
-## 來加入好友吧！
-![](https://github.com/daironghan/Linebot_GreenFingers/blob/main/img/qrcode.png?raw=true)
-
 ## Resources
 臺灣物種名錄 TaiCoL API: https://taibnet.sinica.edu.tw/chi/taicol_api.php
 
